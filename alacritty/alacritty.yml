@@ -1,0 +1,115 @@
+env:
+  TERM: xterm-256color
+
+window:
+  dynamic_padding: true
+  decorations: full
+  title: Alacritty@Garuda
+  class:
+    instance: Alacritty
+    general: Alacritty
+  gtk_theme_variant: dark
+
+scrolling:
+  history: 10000
+  multiplier: 3
+
+draw_bold_text_bright_colors: true
+
+font:
+  size: 12
+  normal:
+    family: FantasqueSansmono Nerd Font
+  bold:
+    family: FantasqueSansmono Nerd Font
+  italic:
+    family: FantasqueSansmono Nerd Font
+  bold_italic:
+    family: FantasqueSansmono Nerd Font
+    size: 10.0
+
+window:
+  opacity: 0.55
+
+window.dynamic_title: true
+
+cursor:
+  style: Underline
+
+live_config_reload: true
+
+shell:
+  program: /usr/bin/bash
+
+mouse:
+  hide_when_typing: true
+
+
+key_bindings:
+    # (Windows, Linux, and BSD only)
+  - { key: V,        mods: Control|Shift, action: Paste            }
+  - { key: C,        mods: Control|Shift, action: Copy             }
+  - { key: Insert,   mods: Shift,         action: PasteSelection   }
+  - { key: Key0,     mods: Control,       action: ResetFontSize    }
+  - { key: Equals,   mods: Control,       action: IncreaseFontSize }
+  - { key: Plus,     mods: Control,       action: IncreaseFontSize }
+  - { key: Minus,    mods: Control,       action: DecreaseFontSize }
+  - { key: Minus,    mods: Control,       action: DecreaseFontSize }
+
+colors:
+  # COLORSCHEME: dracula.yaml
+  # Default colors
+  primary:
+    # hard contrast: background = '0xf9f5d7'
+    #background: '0x282a36'
+    background: '#151515'
+    foreground: '0xf8f8f2'
+
+  # Normal colors
+  normal:
+  # Bright colors
+    black: '0x000000'
+    red: '0xff5555'
+    green: '0x50fa7b'
+    yellow: '0xf1fa8c'
+    blue: '0xbd93f9'
+    magenta: '0xff79c6'
+    cyan: '0x8be9fd'
+    white: '0xbbbbbb'
+
+  # Bright colors
+  bright:
+    black: '0x555555'
+    red: '0xff5555'
+    green: '0x50fa7b'
+    yellow: '0xf1fa8c'
+    blue: '0xcaa9fa'
+    magenta: '0xff79c6'
+    cyan: '0x8be9fd'
+    white: '0xffffff'
+  cursor:
+    text: '0x191622'
+    cursor: '0xf8f8f2'
+
+  indexed_colors: []
+  selection:
+    text: '#ffe9d7'
+    background: '#265b75'
+
+  # Normal colors
+  dim:
+    black: '0x000000'
+    red: '0xa90000'
+    green: '0x049f2b'
+    yellow: '0xa3b106'
+    blue: '0x530aba'
+    magenta: '0xbb006b'
+    cyan: '0x433364'
+    white: '0x5f5f5f'
+  search:
+    matches:
+      foreground: '0xb2b2b2'
+      background: '0xb26818'
+    focused_match:
+      foreground: CellBackground
+      background: CellForeground

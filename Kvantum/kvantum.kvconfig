@@ -1,0 +1,5 @@
+[General]
+theme=Default#
+
+[Applications]
+Sweet-transparent-toolbar=dolphin, okular, gwenview, discord, virtualbox, qbittorrent, vlc, ksudoku, gparted

@@ -1,0 +1,241 @@
+STEP 1:
+
+setfont sun12x22
+
+STEP 2:
+
+iwctl
+
+STEP 3:
+
+gdisk /dev/nvme0n1
+
+ notes:
+
+ boot partition: 1.5GB ef00
+
+ swap partition: 4GB
+
+ root/home partition: rest linux file system
+
+STEP 4: 
+
+mkfs.fat -F 32 /dev/nvme0n1p1
+
+mkswap /dev/nvme0n1p2
+
+mkfs.btrfs /dev/nvme0n1p3
+
+mount /dev/nvme0n1p3 /mnt
+
+btrfs subvolume create /mnt/@
+
+btrfs subvolume create /mnt/@home
+
+umount /mnt
+
+STEP 5:
+
+mkdir /mnt/boot
+
+mkdir /mnt/home
+
+mount -o noatime,compress=lzo,space_cache,subvol=@ /dev/nvme0n1p3 /mnt
+
+mount -o noatime,compress=lzo,space_cache,subvol=@home /dev/nvme0n1p3 /mnt/home
+
+mount /dev/nvme0n1p1 /mnt/boot
+
+swapon /dev/nvme0n1p2
+
+STEP 6:
+
+pacstrap -K /mnt base linux linux-firmware base-devel grub efibootmgr vim neovim sudo git
+
+STEP 7:
+
+genfstab -U /mnt >> /mnt/etc/fstab
+
+STEP 8: 
+
+arch-chroot /mnt
+
+ln -sf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+
+hwclock --systohc
+
+STEP 9:
+
+ notes:
+
+ edit /etc/locale.gen uncomment:
+
+en_US.UTF-8 UTF-8
+
+locale-gen 
+
+STEP 10:
+
+touch /etc/hostname
+
+echo "incalculas" >> /etc/hostname
+
+nvim /etc/hosts
+
+127.0.0.1	localhost
+::1		localhost
+127.0.1.1	incalculas.localdomain	incalculas
+
+STEP 11:
+
+passwd
+
+STEP 12: 
+
+mkdir /boot/efi
+
+mount /dev/nvme0n1p1 /boot/efi
+
+grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
+STEP 13:
+
+useradd -m aki
+
+passwd raki
+
+usermod -aG root, wheel, audio, kvm, lp, optical, storage, video, users, tablet raki
+
+nvim /etc/sudoers
+
+root ALL=(ALL:ALL) ALL
+
+%wheel ALL=(ALL:ALL) ALL
+
+STEP 14:
+
+exit
+
+reboot now
+
+STEP 15:
+
+pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com
+
+pacman-key --lsign-key 3056513887B78AEB
+
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst'
+
+pacman -U 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst'
+
+nvim /etc/pacman.conf
+
+[chaotic-aur]
+Include = /etc/pacman.d/chaotic-mirrorlist 
+
+STEP 16:
+
+git clone https://aur.archlinux.org/paru.git
+
+cd
+
+makepkg -si
+
+STEP 17:
+
+sudo pacman -S xorg-server nvidia-open nvidia-settings nvidia-utils lib32-nvidia-utils optimus-manager sddm sddm-sugar-candy-git qtile alacritty dolphin picom power-profiles-daemon dmenu fish lolcat network-manager-applet nerd-fonts-git dunst when
+
+cp /usr/lib/sddm/sddm.conf.d/default.conf /etc/sddm.conf
+
+nvim /etc/sddm.conf
+
+NOTES:
+ comment out 'displaycommand' line ~100
+ Current=sugar-candy
+
+sudo systemctl status optimus-manager.service
+
+sudo systemctl enable optimus-manager.service
+
+sudo systemctl enable sddm.service
+
+sudo systemctl status NetworkManager.service
+
+NOTES:
+ manage configs now
+
+curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
+
+fish_config
+
+nvim .bashrc
+
+sudo reboot now
+
+STEP 18:
+
+sudo pacman -S pipewire lib32-pipewire noisetorch libpipewire helvum pipewire-alsa pipewire-jack pipewire-pulse pipewire-audio
+
+sudo pacman -S blueman bluez bluez-libs hidapi libldac 
+
+sudo systemctl status bluetooth.service
+
+sudo pacman -S librewolf dolphin candy-icons-git beautyline sweet-dark-theme sweet-kde-theme-git sweet-kde-theme-nova-git sweet-kvantum-theme-git kvantum-qt5-git lxapperance flameshot polkit
+
+NOTES:
+ manage rest of the config
+
+sudo pacman -S vlc gimp 
+
+paru python2-gimp
+
+STEP 19:
+
+sudo pacman -S timeshift-autosnap grub-btrfs
+
+sudo nvim /etc/timeshift-autosnap.conf
+
+# maxSnapshots defines how much old snapshots script should left.
+# Only positive whole numbers can be used.
+# Default value is 3.
+maxSnapshots=10
+
+sudo grub-mkconfig -o /boot/grub/grub.cfg 
+
+sudo pacman -S inotify-tools
+
+sudo systemctl edit --full grub-btrfsd
+
+NOTES:
+ 
+ ExecStart=/usr/bin/grub-btrfsd --syslog /.snapshots
+
+ to
+
+ ExecStart=/usr/bin/grub-btrfsd --syslog --timeshift-auto
+
+sudo systemctl start grub-btrfsd
+
+"start timeshift"
+
+sudo systemctl enable grub-btrfsd
+
+https://www.lorenzobettini.it/2022/07/timeshift-and-grub-btrfs-in-linux-arch/
+
+STEP 20:
+
+mkdir .latex
+
+cd .latex
+
+wget https://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+
+zcat < install-tl-unx.tar.gz | tar xf -
+
+cd install-tl-*
+
+perl ./install-tl --no-interaction # as root or with writable destination
+
+echo "PATH=/usr/local/texlive/2023/bin/x86_64-linux:$PATH" >> .bashrc
